@@ -10,16 +10,15 @@ const app = express();
 //CORS
 app.use(cors());
 
+//Reading and parsing the body
+app.use(express.json());
+
 // Data Base
 connectionDB();
 
 // Routes
-app.get("/", (req, res) => {
-  res.json({
-    ok: true,
-    msg: "Hello world",
-  });
-});
+app.use("/api/users", require("./routes/users.routes"));
+app.use("/api/login", require("./routes/auth.routes"));
 
 app.listen(process.env.PORT, () => {
   console.log("Server running on port" + " " + process.env.PORT);
