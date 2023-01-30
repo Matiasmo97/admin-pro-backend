@@ -32,18 +32,72 @@ const createDoctors = async (req, res = response) => {
   }
 };
 
-const updateDoctors = (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: "updateDoctors",
-  });
+const updateDoctors = async (req, res = response) => {
+  const id = req.params.id;
+  const uid = req.uid;
+
+  try {
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Doctor not found by id",
+        id,
+      });
+    }
+
+    const changesDoctor = {
+      ...req.body,
+      user: uid,
+    };
+
+    const updatedDoctor = await Doctor.findByIdAndUpdate(
+      id,
+      changesDoctor,
+      { new: true }
+    );
+
+    res.status(200).json({
+      ok: true,
+      doctor: updatedDoctor,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Talk to the administrator",
+    });
+  }
 };
 
-const deleteDoctors = (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: "deleteDoctors",
-  });
+const deleteDoctors = async (req, res = response) => {
+  const id = req.params.id;
+
+  try {
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Doctor not found by id",
+        id,
+      });
+    }
+
+    await Doctor.findByIdAndDelete(id);
+
+    res.status(200).json({
+      ok: true,
+      msg: "Doctor deteled",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Talk to the administrator",
+    });
+  }
 };
 
 module.exports = {
